@@ -70,7 +70,6 @@ const turkTelekomApi = axios.create({
         secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
         rejectUnauthorized: false,
         keepAlive: true,
-
     }),
     httpsAgent: new https.Agent({
         secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
@@ -91,6 +90,7 @@ const turkTelekomApi = axios.create({
 
 export const getTurkTelekom = asyncHandler(async (req, res) => {
     const { data, status } = await turkTelekomApi.request({
+        url: "/GetCityDistrictList",
         data: JSON.stringify({"req":{"City":"","District":"","PageNo":1,"PageSize":1000000}})
     }).catch((err) => {
         console.log(JSON.stringify(err));
