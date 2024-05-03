@@ -43,10 +43,10 @@ export const convertTimestamp = (date, languageCode, timeZoneString) => {
 }
 
 export const turkTelekomParser = (data) => {
-    /*String.prototype.replaceAll = function(search, replacement) {
+    String.prototype.replaceAll = function(search, replacement) {
         var target = this;
         return target.replace(new RegExp(search, 'g'), replacement);
-    };*/
+    };
     data = data.replaceAll("\n", "");
     let tempData = new JSDOM(data).window.document.querySelector(".planned-action-block");
     tempData = tempData.querySelectorAll(".planned-action-item");
