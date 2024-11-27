@@ -90,8 +90,9 @@ const turkTelekomApi = axios.create({
 
 export const getTurkTelekom = asyncHandler(async (req, res) => {
     const { data, status } = await turkTelekomApi.request({
-        url: "/GetCityDistrictList",
-        data: JSON.stringify({"req":{"City":"","District":"","PageNo":1,"PageSize":1000000}})
+        //url: "/GetCityDistrictList",
+        url: "",
+        data: JSON.stringify({"req":{"City":"","District":"","PageNo":1,"PageSize":10000}})
     }).catch((err) => {
         console.log(JSON.stringify(err));
         return errorMessage(res, err.message, {"params":req.params,"query":req.query}, "API Error", 400);
@@ -101,7 +102,7 @@ export const getTurkTelekom = asyncHandler(async (req, res) => {
 
     if(status !== 200) return errorMessage(res, "Türk Telekom API is down!", {"params":req.params,"query":req.query}, "Türk Telekom API is down!", 400);
 
-    return successMessage(res, turkTelekomParser(data.d.Data), "Türk Telekom API up!", {"params":req.params,"query":req.query}, 200);
+    return successMessage(res, turkTelekomParser(data?.d?.Data), "Türk Telekom API up!", {"params":req.params,"query":req.query}, 200);
 });
 
 export const getTurkTelekomCities = asyncHandler(async (req, res) => {

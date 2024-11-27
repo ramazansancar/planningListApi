@@ -13,6 +13,7 @@ dotenv.config({
 app.all("*", function(req, res, next) {
     res.contentType("application/json");
     res.header("X-Powered-By", "Express.js");
+    console.log('request:', req.method, req.url, req.body);
     next();
 });
 

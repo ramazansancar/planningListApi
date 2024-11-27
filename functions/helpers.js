@@ -7,6 +7,49 @@ String.prototype.dateConverter = function() {
     return new Date(this.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$3-$2-$1T$4:$5:$6.000Z"));
 };
 
+const replaceAll = (str, find, replace) => {
+    var target = str
+    return target.replace(new RegExp(find, 'g'), replace);
+}
+
+const nullCheck = (value) => {
+    if(typeof value === "string"){
+        value = value.trim()
+        value.replace(/(\r\n|\n|\r)/gm, "");
+        // 2 space conver to 1 space
+        value = value.replace(/  +/g, ' ');
+    }
+    return (value === null || value === undefined || value === "" || value === "null" || value === "undefined" || value === "NaN" || value === NaN || value === " " || value === '-') ? null : value;
+}
+
+const booleanParser = (data) => {
+    if(typeof data === "string"){
+        data = data.trim()
+        data = parseInt(data)
+    }
+    if(typeof data === "boolean"){
+        return data
+    }
+
+    return (data === 1) ? true : false;
+};
+
+const unicodeToString = (text) => {
+    text = nullCheck(text)
+    if(text != null) return text.replace(/\\u[\dA-F]{4}/gi, 
+        function (match) {
+            return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
+        }
+    );
+}
+
+export {
+    replaceAll,
+    nullCheck,
+    booleanParser,
+    unicodeToString,
+}
+
 export const errorMessage = (res, message, parameters = {}, result = {}, status = 400, errorCode = null) => {
     if(typeof status === "string" || status === null || status === ""){
         status = 400
@@ -54,11 +97,14 @@ export const turkTelekomParser = (data) => {
 
     tempData.forEach((item) => {
         let tempObject = {};
-        tempObject.date = item.querySelector("div.date > span").innerHTML;
-        tempObject.city = item.querySelector("div.city > span").innerHTML;
-        tempObject.district = item.querySelector("div.district > span").innerHTML;
-        tempObject.serviceType = item.querySelector("div.service-type > span").innerHTML;
-        tempObject.description = item.querySelector("div.desc > span").innerHTML;
+        let fullDate = nullCheck(item.querySelector("div.date > span").innerHTML)
+        tempObject.date = fullDate;
+        tempObject.startDate = nullCheck(fullDate.split('-')[0]).trim();
+        tempObject.endDate = nullCheck(fullDate.split('-')[1]).trim();
+        tempObject.city = nullCheck(item.querySelector("div.city > span").innerHTML);
+        tempObject.district = nullCheck(item.querySelector("div.district > span").innerHTML);
+        tempObject.serviceType = nullCheck(item.querySelector("div.service-type > span").innerHTML);
+        tempObject.description = nullCheck(item.querySelector("div.desc > span").innerHTML);
         tempArray.push(tempObject);
     });
     return tempArray;
