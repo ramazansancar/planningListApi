@@ -103,6 +103,21 @@ export const turkTelekomParser = (data) => {
         tempObject.endDate = nullCheck(fullDate.split('-')[1]).trim();
         tempObject.city = nullCheck(item.querySelector("div.city > span").innerHTML);
         tempObject.district = nullCheck(item.querySelector("div.district > span").innerHTML);
+
+        // City
+        if(nullCheck(tempObject.city) !== null && tempObject.city.includes(",")){
+            tempObject.city = tempObject.city.split(",").map((item) => item.trim());
+        }else{
+            tempObject.city = tempObject.city
+        }
+
+        // District
+        if(nullCheck(tempObject.district) !== null && tempObject.district.includes(",")){
+            tempObject.district = tempObject.district.split(",").map((item) => item.trim());
+        }else{
+            tempObject.district = tempObject.district;
+        }
+
         tempObject.serviceType = nullCheck(item.querySelector("div.service-type > span").innerHTML);
         tempObject.description = nullCheck(item.querySelector("div.desc > span").innerHTML);
         tempArray.push(tempObject);
