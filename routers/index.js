@@ -16,6 +16,7 @@ router.get("/turknet/", planningController.getTurkNet);
 router.get("/turktelekom/cities/", planningController.getTurkTelekomCities);
 router.get("/turktelekom/", planningController.getTurkTelekom);
 router.get("/gibir/", planningController.getGibir);
+router.get("/turkcell/", planningController.getTurkcell);
 
 router.get("*", (req, res) => {
     return errorMessage(res, "404 Not Found", req.params, "404 Not Found", 404)

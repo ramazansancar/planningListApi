@@ -33,3 +33,9 @@ Returns Turktelekom's cities: https://planningoperationapi-wen7okua.b4a.run/turk
 ### GET /gibir
 
 Returns Gibir's planning list: https://planningoperationapi-wen7okua.b4a.run/gibir
+
+### GET /turkcell
+
+Returns Turkcell's planning list: https://planningoperationapi-wen7okua.b4a.run/turkcell
+
+**Note:** Not working 7/24 because of Turkcell API restrictions.

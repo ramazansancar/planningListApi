@@ -8,7 +8,8 @@ import {
     errorMessage,
     successMessage,
     turkTelekomParser,
-    gibirParser
+    gibirParser,
+    turkcellParser
 } from "../../functions/helpers.js";
 import dotenv from "dotenv";
 dotenv.config();
@@ -20,6 +21,8 @@ const {
     TURKTELEKOM_REQUEST_METHOD,
     GIBIR_URL,
     GIBIR_REQUEST_METHOD,
+    TURKCELL_URL,
+    TURKCELL_REQUEST_METHOD,
 } = process.env;
 
 const turkNetApi = axios.create({
@@ -193,7 +196,6 @@ export const getTurkTelekomCities = asyncHandler(async (req, res) => {
     return successMessage(res, mockData, "Türk Telekom Cities", {"params":req.params,"query":req.query}, 200);
 });
 
-
 const gibirApi = axios.create({
     baseURL: GIBIR_URL,
     headers: {
@@ -216,4 +218,33 @@ export const getGibir = asyncHandler(async (req, res) => {
     if(status !== 200) return errorMessage(res, "Gibir API is down!", {"params":req.params,"query":req.query}, "Gibir API is down!", 400);
 
     return successMessage(res, gibirParser(data), "Gibir API up!", {"params":req.params,"query":req.query}, 200);
+});
+
+const turkcellApi = axios.create({
+    baseURL: TURKCELL_URL,
+    headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Accept-Language": "tr,en-US;q=0.9,en;q=0.8,tr-TR;q=0.7,zh-CN;q=0.6,zh-TW;q=0.5,zh;q=0.4,ja;q=0.3,ko;q=0.2,bg;q=0.1",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "Origin": "https://www.turkcell.com.tr",
+        "Referer": "https://www.turkcell.com.tr/trc/hakkimizda/duyurular/planli-calisma-bilgilendirme",
+    },
+    timeout: 30000
+});
+
+export const getTurkcell = asyncHandler(async (req, res) => {
+    const { data, status } = await turkcellApi.request({
+        method: TURKCELL_REQUEST_METHOD
+    }).catch((err) => {
+        console.log(JSON.stringify(err));
+        return errorMessage(res, err.message, {"params":req.params,"query":req.query}, "Turkcell API is down!", 400);
+    });
+
+    if(data === null || data === undefined) return errorMessage(res, "Turkcell API is down!", {"params":req.params,"query":req.query}, "Turkcell API is down!", 400);
+
+    if(status !== 200) return errorMessage(res, "Turkcell API is down!", {"params":req.params,"query":req.query}, "Turkcell API is down!", 400);
+
+    return successMessage(res, turkcellParser(data?.data), "Turkcell API up!", {"params":req.params,"query":req.query}, 200);
 });

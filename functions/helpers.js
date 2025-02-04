@@ -158,6 +158,27 @@ export const gibirParser = (data) => {
     return tempArray;
 }
 
+export const turkcellParser = (data) => {
+    /*
+    {"city":["ISTANBUL"],"district":["SISLI"],"startTime":"2025-02-05T02:00:00","endTime":"2025-02-05T06:00:00","descServiceName":["Data"]},
+    ISTANBUL ilinden hizmet alan müşterilerimize daha iyi hizmet verebilmek için Ses, Data servisimizde çalışma planlanmıştır. Bazı müşterilerimizin kısa süreli servis kesintileri yaşaması öngörülmektedir.
+    getPlannedWork
+    */
+    let tempData = [];
+
+    data.forEach((item) => {
+        let tempObject = {};
+        tempObject.city = item?.city;
+        tempObject.district = item?.district;
+        tempObject.startDate = item?.startTime;
+        tempObject.endDate = item?.endTime;
+        tempObject.serviceType = item?.descServiceName;
+        tempObject.description = `${item?.city} ilinden hizmet alan müşterilerimize daha iyi hizmet verebilmek için ${item?.descServiceName} servisimizde çalışma planlanmıştır. Bazı müşterilerimizin kısa süreli servis kesintileri yaşaması öngörülmektedir.`;
+        tempData.push(tempObject);
+    });
+    return tempData;
+};
+
 export const countryConverter = (countryCode) => {
     const countryList = {
         "AF": "Afghanistan",
