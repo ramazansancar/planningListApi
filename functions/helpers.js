@@ -3,6 +3,22 @@ import { JSDOM } from "jsdom";
 const languageCode = "tr-TR";
 const timeZoneString = "Europe/Istanbul";
 
+export const nowTime = (i = 1) => {
+	const dates = new Date().toLocaleString('tr-TR', {
+		timeZone: 'Europe/Istanbul',
+		hour12: false,
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		second: "2-digit",
+	});
+	if(i === 1) return dates.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$1/$2/$3 $4:$5:$6")
+  	else if(i === 2) return dates.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$1-$2-$3_$4-$5-$6")
+	else return dates.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$3-$2-$1_$4-$5-$6");
+};
+
 String.prototype.dateConverter = function() {
     return new Date(this.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$3-$2-$1T$4:$5:$6.000Z"));
 };
