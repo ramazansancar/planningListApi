@@ -30,9 +30,13 @@ const turkNetApi = axios.create({
     method: TURKNET_REQUEST_METHOD,
     timeout: 30000,
     httpAgent: new http.Agent({
+        secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
+        rejectUnauthorized: false,
         keepAlive: true
     }),
     httpsAgent: new https.Agent({
+        secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
+        rejectUnauthorized: false,
         keepAlive: true
     }),
     headers: {
@@ -48,21 +52,24 @@ const turkNetApi = axios.create({
 });
 
 export const getTurkNet = asyncHandler(async (req, res) => {
-    const { data, status } = await turkNetApi.request().catch((err) => {
+    try {
+        const { data, status } = await turkNetApi.request();
+
+        if(data === null || data === undefined) return errorMessage(res, "TurkNet API is down!", {"params":req.params,"query":req.query}, "TurkNet API is down!", 400);
+
+        if(status !== 200) return errorMessage(res, "TurkNet API is down!", {"params":req.params,"query":req.query}, "TurkNet API is down!", 400);
+        
+        let plannedOperationInfoList = [];
+        if(data.Result.PlannedOperationInfoList !== null && data.Result.PlannedOperationInfoList !== undefined) plannedOperationInfoList = data.Result.PlannedOperationInfoList;
+        
+        let telecomSsgFaultInfoList = [];
+        if(data.Result.TelecomSsgFaultInfoList !== null && data.Result.TelecomSsgFaultInfoList !== undefined) telecomSsgFaultInfoList = data.Result.TelecomSsgFaultInfoList;
+
+        return successMessage(res, {plannedOperationInfoList, telecomSsgFaultInfoList}, "TurkNet API up!", {"params":req.params,"query":req.query}, 200);
+    } catch (err) {
         console.log(JSON.stringify(err));
         return errorMessage(res, err.message, {"params":req.params,"query":req.query}, "API Error", 400);
-    });
-
-    if(data === null || data === undefined) return errorMessage(res, "TurkNet API is down!", {"params":req.params,"query":req.query}, "TurkNet API is down!", 400);
-
-    if(status !== 200) return errorMessage(res, "TurkNet API is down!", {"params":req.params,"query":req.query}, "TurkNet API is down!", 400);
-    let plannedOperationInfoList = [];
-    if(data.Result.PlannedOperationInfoList !== null && data.Result.PlannedOperationInfoList !== undefined) plannedOperationInfoList = data.Result.PlannedOperationInfoList;
-    
-    let telecomSsgFaultInfoList = [];
-    if(data.Result.TelecomSsgFaultInfoList !== null && data.Result.TelecomSsgFaultInfoList !== undefined) telecomSsgFaultInfoList = data.Result.TelecomSsgFaultInfoList;
-
-    return successMessage(res, {plannedOperationInfoList, telecomSsgFaultInfoList}, "TurkNet API up!", {"params":req.params,"query":req.query}, 200);
+    }
 });
 
 const turkTelekomApi = axios.create({

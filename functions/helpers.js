@@ -4,22 +4,22 @@ const languageCode = "tr-TR";
 const timeZoneString = "Europe/Istanbul";
 
 export const nowTime = (i = 1) => {
-	const dates = new Date().toLocaleString('tr-TR', {
-		timeZone: 'Europe/Istanbul',
-		hour12: false,
-		year: "numeric",
-		month: "2-digit",
-		day: "2-digit",
-		hour: "2-digit",
-		minute: "2-digit",
-		second: "2-digit",
-	});
-	if(i === 1) return dates.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$1/$2/$3 $4:$5:$6")
-  	else if(i === 2) return dates.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$1-$2-$3_$4-$5-$6")
-	else return dates.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$3-$2-$1_$4-$5-$6");
+    const dates = new Date().toLocaleString('tr-TR', {
+        timeZone: 'Europe/Istanbul',
+        hour12: false,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
+    if (i === 1) return dates.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$1/$2/$3 $4:$5:$6")
+    else if (i === 2) return dates.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$1-$2-$3_$4-$5-$6")
+    else return dates.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$3-$2-$1_$4-$5-$6");
 };
 
-String.prototype.dateConverter = function() {
+String.prototype.dateConverter = function () {
     return new Date(this.replace(/(\d+)\.(\d+)\.(\d+)\s(\d+):(\d+):(\d+)/, "$3-$2-$1T$4:$5:$6.000Z"));
 };
 
@@ -29,7 +29,7 @@ const replaceAll = (str, find, replace) => {
 }
 
 const nullCheck = (value) => {
-    if(typeof value === "string"){
+    if (typeof value === "string") {
         value = value.trim()
         value.replace(/(\r\n|\n|\r)/gm, "");
         // 2 space conver to 1 space
@@ -39,11 +39,11 @@ const nullCheck = (value) => {
 }
 
 const booleanParser = (data) => {
-    if(typeof data === "string"){
+    if (typeof data === "string") {
         data = data.trim()
         data = parseInt(data)
     }
-    if(typeof data === "boolean"){
+    if (typeof data === "boolean") {
         return data
     }
 
@@ -52,7 +52,7 @@ const booleanParser = (data) => {
 
 const unicodeToString = (text) => {
     text = nullCheck(text)
-    if(text != null) return text.replace(/\\u[\dA-F]{4}/gi, 
+    if (text != null) return text.replace(/\\u[\dA-F]{4}/gi,
         function (match) {
             return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
         }
@@ -67,7 +67,7 @@ export {
 }
 
 export const errorMessage = (res, message, parameters = {}, result = {}, status = 400, errorCode = null) => {
-    if(typeof status === "string" || status === null || status === ""){
+    if (typeof status === "string" || status === null || status === "") {
         status = 400
     }
     return res
@@ -82,7 +82,7 @@ export const errorMessage = (res, message, parameters = {}, result = {}, status 
 }
 
 export const successMessage = (res, data, message = "request successful.", parameters = {}, status = 200) => {
-    if(typeof status === "string" || status === null || status === ""){
+    if (typeof status === "string" || status === null || status === "") {
         status = 200
     }
 
@@ -102,7 +102,7 @@ export const convertTimestamp = (date, languageCode, timeZoneString) => {
 }
 
 export const turkTelekomParser = (data) => {
-    String.prototype.replaceAll = function(search, replacement) {
+    String.prototype.replaceAll = function (search, replacement) {
         var target = this;
         return target.replace(new RegExp(search, 'g'), replacement);
     };
@@ -121,16 +121,16 @@ export const turkTelekomParser = (data) => {
         tempObject.district = nullCheck(item.querySelector("div.district > span").innerHTML);
 
         // City
-        if(nullCheck(tempObject.city) !== null && tempObject.city.includes(",")){
+        if (nullCheck(tempObject.city) !== null && tempObject.city.includes(",")) {
             tempObject.city = tempObject.city.split(",").map((item) => item.trim());
-        }else{
+        } else {
             tempObject.city = tempObject.city
         }
 
         // District
-        if(nullCheck(tempObject.district) !== null && tempObject.district.includes(",")){
+        if (nullCheck(tempObject.district) !== null && tempObject.district.includes(",")) {
             tempObject.district = tempObject.district.split(",").map((item) => item.trim());
-        }else{
+        } else {
             tempObject.district = tempObject.district;
         }
 
@@ -142,18 +142,65 @@ export const turkTelekomParser = (data) => {
 }
 
 export const gibirParser = (data) => {
-    let tempData = new JSDOM(data).window.document.querySelector("tbody#notification-filter-list");
-    tempData = tempData.querySelectorAll("tr");
+    const dom = new JSDOM(data);
+    const document = dom.window.document;
+
+    // Desktop view table'ı bul
+    let tempData = document.querySelector("table tbody");
+    if (!tempData) {
+        // Fallback: eski yapı
+        tempData = document.querySelector("tbody#notification-filter-list");
+    }
+
+    if (!tempData) return [];
+
+    const rows = tempData.querySelectorAll("tr");
     let tempArray = [];
 
-    tempData.forEach((item) => {
-        let tempObject = {};
-        tempObject.id = parseInt(item.querySelector("td:nth-child(1) > span.plan-num").innerHTML);
-        tempObject.startDate = (item.querySelector("td:nth-child(1)").innerHTML.split("</span>")[1]).dateConverter();
-        tempObject.endDate = (item.querySelector("td:nth-child(2)").innerHTML).dateConverter();
-        tempObject.description = item.querySelector("td:nth-child(3)").innerHTML;
-        tempObject.status = item.querySelector("td:nth-child(4)").innerHTML; // Beklemede, Düzeltildi
-        tempArray.push(tempObject);
+    rows.forEach((item, index) => {
+        try {
+            let tempObject = {};
+
+            // Tarih parse fonksiyonu (örn: "20 Oca 2026, 00:00" -> ISO date)
+            const parseGibirDate = (dateStr) => {
+                if (!dateStr) return null;
+
+                const monthMap = {
+                    'Oca': '01', 'Şub': '02', 'Mar': '03', 'Nis': '04',
+                    'May': '05', 'Haz': '06', 'Tem': '07', 'Ağu': '08',
+                    'Eyl': '09', 'Eki': '10', 'Kas': '11', 'Ara': '12'
+                };
+
+                // "20 Oca 2026, 00:00" formatı
+                const match = dateStr.trim().match(/(\d+)\s+(\w+)\s+(\d{4}),\s+(\d{2}):(\d{2})/);
+                if (match) {
+                    const [, day, month, year, hour, minute] = match;
+                    const monthNum = monthMap[month] || '01';
+                    return new Date(`${year}-${monthNum}-${day.padStart(2, '0')}T${hour}:${minute}:00.000Z`);
+                }
+                return null;
+            };
+
+            const td1 = item.querySelector("td:nth-child(1)");
+            const td2 = item.querySelector("td:nth-child(2)");
+            const td3 = item.querySelector("td:nth-child(3)");
+            const td4 = item.querySelector("td:nth-child(4)");
+
+            if (!td1 || !td2 || !td3 || !td4) return;
+
+            tempObject.id = index + 1;
+            tempObject.startDate = parseGibirDate(td1.textContent);
+            tempObject.endDate = parseGibirDate(td2.textContent);
+            tempObject.description = nullCheck(td3.textContent);
+
+            // Durum badge'inden text al
+            const statusBadge = td4.querySelector("div");
+            tempObject.status = nullCheck(statusBadge ? statusBadge.textContent : td4.textContent); // Beklemede, Düzeltildi
+
+            tempArray.push(tempObject);
+        } catch (err) {
+            console.error(`Error parsing row ${index}:`, err);
+        }
     });
     return tempArray;
 }

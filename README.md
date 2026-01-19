@@ -18,7 +18,7 @@ Hello world endpoint: https://planningoperationapi-3hku41i9.b4a.run/
 
 Health check endpoint: https://planningoperationapi-3hku41i9.b4a.run/healthCheck
 
-### GET /turknet
+### GET /turknet (DOWN!)
 
 Returns Turknet's planning list: https://planningoperationapi-3hku41i9.b4a.run/turknet
 
@@ -34,7 +34,7 @@ Returns Turktelekom's cities: https://planningoperationapi-3hku41i9.b4a.run/turk
 
 Returns Gibir's planning list: https://planningoperationapi-3hku41i9.b4a.run/gibir
 
-### GET /turkcell
+### GET /turkcell (DOWN!)
 
 Returns Turkcell's planning list: https://planningoperationapi-3hku41i9.b4a.run/turkcell
 
